@@ -1,3 +1,4 @@
+/* global module */
 import jQuery from 'jquery';
 import moment from 'moment';
 import Raven from 'raven-js';
@@ -48,28 +49,40 @@ jQuery.ajaxSetup({
 // these get exported to a global variable, which is important as its the only
 // way we can call into scoped objects
 
+let render = () => {
+  let rootEl = document.getElementById('blk_router');
+  const Main = require('./main').default;
+  ReactDOM.render(React.createElement(Main), rootEl);
+};
+
+if (module.hot) {
+  module.hot.accept('./main', function() {
+    setTimeout(render, 1);
+  });
+}
+
 export default {
-  jQuery: jQuery,
-  moment: moment,
-  Raven: Raven,
-  React: React,
+  jQuery,
+  moment,
+  Raven,
+  React,
   ReactDOM: {
     findDOMNode: ReactDOM.findDOMNode,
     render: ReactDOM.render
   },
-  PropTypes: PropTypes,
+  PropTypes,
   ReactDOMServer: {
-    renderToStaticMarkup: renderToStaticMarkup
+    renderToStaticMarkup
   },
   ReactBootstrap: {
     Modal: ReactBootstrapModal
   },
-  Reflux: Reflux,
-  Router: Router,
+  Reflux,
+  Router,
+  SentryRenderApp: render,
 
   Sentry: {
-    api: api,
-    routes: require('./routes').default,
+    api,
     forms: {
       // we dont yet export all form field classes as they're not
       // all needed by sentry.io

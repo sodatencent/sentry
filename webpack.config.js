@@ -16,8 +16,8 @@ if (process.env.SENTRY_STATIC_DIST_PATH) {
 
 var IS_PRODUCTION = process.env.NODE_ENV === 'production';
 var IS_TEST = process.env.NODE_ENV === 'TEST' || process.env.TEST_SUITE;
-
-var REFRESH = process.env.WEBPACK_LIVERELOAD === '1';
+var WEBPACK_DEV_PORT = process.env.WEBPACK_DEV_PORT;
+var SENTRY_DEVSERVER_PORT = process.env.SENTRY_DEVSERVER_PORT;
 
 var babelConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '.babelrc')));
 babelConfig.cacheDirectory = true;
@@ -236,7 +236,7 @@ var legacyCssConfig = {
   },
   plugins: [new ExtractTextPlugin('[name].css')],
   resolve: {
-    extensions: ['.less'],
+    extensions: ['.less', '.js'],
     modules: [path.join(__dirname, staticPrefix), 'node_modules']
   },
   module: {
@@ -256,6 +256,27 @@ var legacyCssConfig = {
     ]
   }
 };
+
+// Dev only! Hot module reloading
+if (!IS_PRODUCTION && WEBPACK_DEV_PORT && SENTRY_DEVSERVER_PORT) {
+  // Otherwise with hot reloads we get module ID number
+  appConfig.plugins.push(new webpack.NamedModulesPlugin());
+  // HMR
+  appConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
+  appConfig.devServer = {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': 'true'
+    },
+    contentBase: './src/sentry/static/sentry',
+    hot: true,
+    port: WEBPACK_DEV_PORT
+  };
+
+  // Required, without this we get this on updates:
+  // [HMR] Update failed: SyntaxError: Unexpected token < in JSON at position 12
+  appConfig.output.publicPath = 'http://localhost:' + WEBPACK_DEV_PORT + '/';
+}
 
 var minificationPlugins = [
   // This compression-webpack-plugin generates pre-compressed files
@@ -280,12 +301,6 @@ var minificationPlugins = [
         appConfig.devtool.indexOf('source-map') >= 0)
   })
 ];
-
-if (!IS_PRODUCTION && REFRESH) {
-  appConfig.plugins.push(
-    new (require('webpack-livereload-plugin'))({appendScriptTag: true})
-  );
-}
 
 if (IS_PRODUCTION) {
   // NOTE: can't do plugins.push(Array) because webpack/webpack#2217
