@@ -1,5 +1,5 @@
 /*eslint-env node*/
-/*eslint no-var:0*/
+/*eslint no-var:0 import/no-nodejs-modules:0 */
 var path = require('path'),
   fs = require('fs'),
   webpack = require('webpack'),
@@ -122,7 +122,10 @@ var appConfig = {
             loader: 'style-loader'
           },
           {
-            loader: 'css-loader' + (IS_PRODUCTION ? '?minimize=true' : '')
+            loader: 'css-loader',
+            options: {
+              minimize: IS_PRODUCTION
+            }
           },
           {
             loader: 'less-loader'
@@ -244,9 +247,17 @@ var legacyCssConfig = {
       {
         test: /\.less$/,
         include: path.join(__dirname, staticPrefix),
-        loader: ExtractTextPlugin.extract({
-          fallbackLoader: 'style-loader?sourceMap=false',
-          loader: 'css-loader' + (IS_PRODUCTION ? '?minimize=true' : '') + '!less-loader'
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader?sourceMap=false',
+          use: [
+            {
+              loader: 'css-loader',
+              options: {
+                minimize: IS_PRODUCTION
+              }
+            },
+            'less-loader'
+          ]
         })
       },
       {
