@@ -22,7 +22,7 @@ def get_preprocess_hash_inputs(event):
 
 
 def get_preprocess_hash_inputs_with_reason(data):
-    interfaces = get_interfaces(data)
+    interfaces = get_interfaces(data, is_processed_data=False)
     for interface in six.itervalues(interfaces):
         # normalize_in_app hasn't run on the data, so
         # `in_app` isn't necessarily accurate
