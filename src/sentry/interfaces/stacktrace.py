@@ -427,6 +427,8 @@ class Frame(Interface):
                 output.append(remove_function_outliers(self.function))
         elif self.lineno is not None:
             output.append(self.lineno)
+            if not self.is_processed_data:
+                output.append(self.colno)
         return output
 
     def get_api_context(self, is_public=False, pad_addr=None):

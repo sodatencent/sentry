@@ -1,12 +1,14 @@
 from __future__ import absolute_import
 
 import six
+from collections import OrderedDict
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from sentry.utils.html import escape
 from sentry.utils.imports import import_string
+from sentry.utils.safe import safe_execute
 
 
 def iter_interfaces():
@@ -34,6 +36,27 @@ def get_interface(name):
     return interface
 
 
+def get_interfaces(data, is_processed_data=True):
+    result = []
+    for key, data in six.iteritems(data):
+        try:
+            cls = get_interface(key)
+        except ValueError:
+            continue
+
+        value = safe_execute(cls.to_python, data, _with_transaction=False)
+        if not value:
+            continue
+
+        value.is_processed_data = is_processed_data
+
+        result.append((key, value))
+
+    return OrderedDict(
+        (k, v) for k, v in sorted(result, key=lambda x: x[1].get_score(), reverse=True)
+    )
+
+
 class InterfaceValidationError(Exception):
     pass
 
@@ -51,6 +74,7 @@ class Interface(object):
 
     def __init__(self, **data):
         self._data = data or {}
+        self.is_processed_data = True
 
     def __eq__(self, other):
         if type(self) != type(other):
@@ -66,9 +90,14 @@ class Interface(object):
             self._data = {}
 
     def __getattr__(self, name):
+        if name == 'is_processed_data':
+            return super(Interface, self).__getattr__(name)
         return self._data[name]
 
     def __setattr__(self, name, value):
+        if name == 'is_processed_data':
+            return super(Interface, self).__setattr__(name, value)
+
         if name == '_data':
             self.__dict__['_data'] = value
         else:
