@@ -1,5 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`BooleanField render() coerces value to be boolean 1`] = `
+<div
+  className="control-group checkbox"
+>
+  <div
+    className="controls"
+  >
+    <label
+      className="control-label"
+    >
+      <input
+        defaultChecked={0}
+        disabled={false}
+        id="id-fieldName"
+        onChange={[Function]}
+        type="checkbox"
+      />
+    </label>
+  </div>
+</div>
+`;
+
 exports[`BooleanField render() renders with form context 1`] = `
 <div
   className="control-group checkbox"
