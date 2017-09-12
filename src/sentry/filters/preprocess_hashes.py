@@ -1,10 +1,12 @@
 from __future__ import absolute_import
 
+import functools
 import six
 
 from django.core.cache import cache, get_cache, InvalidCacheBackendError
 
 from sentry.interfaces.base import get_interfaces
+from sentry.event_manager import _get_hashes_from_fingerprint, md5_from_hash
 
 
 try:
@@ -31,3 +33,26 @@ def get_preprocess_hash_inputs_with_reason(data):
             continue
         return (interface.get_path(), result)
     return ('message', [data['message']])
+
+
+def get_preprocess_hashes_from_fingerprint(data, fingerprint):
+    return _get_hashes_from_fingerprint(
+        functools.partial(get_preprocess_hash_inputs, data),
+        fingerprint,
+    )
+
+
+def get_preprocess_hashes(data):
+    fingerprint = data.get('fingerprint')
+    checksum = data.get('checksum')
+
+    if fingerprint:
+        hashes = [
+            md5_from_hash(h) for h in get_preprocess_hashes_from_fingerprint(data, fingerprint)
+        ]
+    elif checksum:
+        hashes = [checksum]
+    else:
+        hashes = [md5_from_hash(h) for h in get_preprocess_hash_inputs(data)]
+
+    return hashes
