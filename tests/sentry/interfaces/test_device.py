@@ -11,7 +11,7 @@ from sentry.testutils import TestCase
 
 class DeviceTest(TestCase):
     def test_serialize_behavior(self):
-        assert Device.to_python({
+        assert Device.to_python(True, {
             'name': 'Windows',
             'version': '95',
         }).to_json() == {
@@ -21,15 +21,15 @@ class DeviceTest(TestCase):
 
     def test_missing_name(self):
         with pytest.raises(InterfaceValidationError):
-            assert Device.to_python({
+            assert Device.to_python(True, {
                 'version': '95',
             })
 
     def test_missing_version(self):
         with pytest.raises(InterfaceValidationError):
-            assert Device.to_python({
+            assert Device.to_python(True, {
                 'name': 'Windows',
             })
 
     def test_path(self):
-        assert Device().get_path() == 'device'
+        assert Device(True).get_path() == 'device'

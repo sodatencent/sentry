@@ -254,7 +254,7 @@ def handle_nan(value):
 
 class Frame(Interface):
     @classmethod
-    def to_python(cls, data, raw=False):
+    def to_python(cls, is_processed_data, data, raw=False):
         abs_path = data.get('abs_path')
         filename = data.get('filename')
         symbol = data.get('symbol')
@@ -368,7 +368,7 @@ class Frame(Interface):
         else:
             kwargs['colno'] = None
 
-        return cls(**kwargs)
+        return cls(is_processed_data, **kwargs)
 
     def get_hash(self, platform=None):
         """
@@ -655,7 +655,7 @@ class Stacktrace(Interface):
         return iter(self.frames)
 
     @classmethod
-    def to_python(cls, data, slim_frames=True, raw=False):
+    def to_python(cls, is_processed_data, data, slim_frames=True, raw=False):
         if not data.get('frames'):
             raise InterfaceValidationError("No 'frames' present")
 
@@ -664,7 +664,7 @@ class Stacktrace(Interface):
 
         frame_list = [
             # XXX(dcramer): handle PHP sending an empty array for a frame
-            Frame.to_python(f or {}, raw=raw) for f in data['frames']
+            Frame.to_python(is_processed_data, f or {}, raw=raw) for f in data['frames']
         ]
 
         kwargs = {
@@ -682,7 +682,7 @@ class Stacktrace(Interface):
         else:
             kwargs['frames_omitted'] = None
 
-        instance = cls(**kwargs)
+        instance = cls(is_processed_data, **kwargs)
         if slim_frames:
             slim_frame_data(instance)
         return instance

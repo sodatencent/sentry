@@ -666,7 +666,7 @@ class ClientApiHelper(object):
                     continue
 
             try:
-                inst = interface.to_python(value)
+                inst = interface.to_python(True, value)
                 data[inst.get_path()] = inst.to_json()
             except Exception as e:
                 if isinstance(e, InterfaceValidationError):
@@ -705,7 +705,7 @@ class ClientApiHelper(object):
                 k = 'sentry.interfaces.Message'
                 interface = get_interface(k)
                 try:
-                    inst = interface.to_python(value)
+                    inst = interface.to_python(True, value)
                     data[inst.get_path()] = inst.to_json()
                 except Exception as e:
                     if isinstance(e, InterfaceValidationError):
@@ -881,7 +881,7 @@ class CspApiHelper(ClientApiHelper):
         report = {k.replace('-', '_'): v for k, v in six.iteritems(data)}
 
         try:
-            inst = Csp.to_python(report)
+            inst = Csp.to_python(True, report)
         except Exception as exc:
             raise APIForbidden('Invalid CSP Report: %s' % exc)
 

@@ -11,7 +11,7 @@ from sentry.testutils import TestCase
 class QueryTest(TestCase):
     @fixture
     def interface(self):
-        return Query.to_python(dict(query='SELECT 1', engine='psycopg2'))
+        return Query.to_python(True, dict(query='SELECT 1', engine='psycopg2'))
 
     def test_serialize_behavior(self):
         assert self.interface.to_json() == {
@@ -23,5 +23,5 @@ class QueryTest(TestCase):
         assert self.interface.get_hash() == [self.interface.query]
 
     def test_serialize_unserialize_behavior(self):
-        result = type(self.interface).to_python(self.interface.to_json())
+        result = type(self.interface).to_python(True, self.interface.to_json())
         assert result.to_json() == self.interface.to_json()

@@ -81,6 +81,7 @@ def generate_user(username=None, email=None, ip_address=None, id=None):
         username = random_username()
         email = '{}@example.com'.format(username)
     return UserInterface.to_python(
+        True,
         {
             'id': id,
             'username': username,

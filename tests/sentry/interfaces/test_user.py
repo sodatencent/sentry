@@ -17,7 +17,7 @@ class UserTest(TestCase):
 
     @fixture
     def interface(self):
-        return User.to_python(dict(
+        return User.to_python(True, dict(
             id=1,
             email='lol@example.com',
             favorite_color='brown',
@@ -37,21 +37,21 @@ class UserTest(TestCase):
 
     def test_invalid_ip_address(self):
         with self.assertRaises(Exception):
-            User.to_python(dict(
+            User.to_python(True, dict(
                 ip_address='abc',
             ))
 
     def test_invalid_email_address(self):
         with self.assertRaises(Exception):
-            User.to_python(dict(
+            User.to_python(True, dict(
                 email=1,
             ))
 
         with self.assertRaises(Exception):
-            User.to_python(dict(
+            User.to_python(True, dict(
                 email='foo',
             ))
 
     def test_serialize_unserialize_behavior(self):
-        result = type(self.interface).to_python(self.interface.to_json())
+        result = type(self.interface).to_python(True, self.interface.to_json())
         assert result.to_json() == self.interface.to_json()

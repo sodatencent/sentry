@@ -41,7 +41,7 @@ class Template(Interface):
     score = 1100
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, is_processed_data, data):
         if not data.get('filename'):
             raise InterfaceValidationError("Missing 'filename'")
         if not data.get('context_line'):
@@ -58,7 +58,7 @@ class Template(Interface):
             'pre_context': data.get('pre_context'),
             'post_context': data.get('post_context'),
         }
-        return cls(**kwargs)
+        return cls(is_processed_data, **kwargs)
 
     def get_alias(self):
         return 'template'

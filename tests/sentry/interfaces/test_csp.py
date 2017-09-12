@@ -12,6 +12,7 @@ class CspTest(TestCase):
     @fixture
     def interface(self):
         return Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com',
                 violated_directive='style-src cdn.example.com',
@@ -24,7 +25,7 @@ class CspTest(TestCase):
         assert self.interface.get_path() == 'sentry.interfaces.Csp'
 
     def test_serialize_unserialize_behavior(self):
-        result = type(self.interface).to_python(self.interface.to_json())
+        result = type(self.interface).to_python(True, self.interface.to_json())
         assert result.to_json() == self.interface.to_json()
 
     def test_basic(self):
@@ -35,6 +36,7 @@ class CspTest(TestCase):
 
     def test_coerce_blocked_uri_if_missing(self):
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com',
                 effective_directive='script-src',
@@ -44,6 +46,7 @@ class CspTest(TestCase):
 
     def test_get_culprit(self):
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 violated_directive='style-src http://cdn.example.com',
@@ -53,6 +56,7 @@ class CspTest(TestCase):
         assert result.get_culprit() == 'style-src http://cdn.example.com'
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 violated_directive='style-src cdn.example.com',
@@ -62,6 +66,7 @@ class CspTest(TestCase):
         assert result.get_culprit() == 'style-src cdn.example.com'
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='https://example.com/foo',
                 violated_directive='style-src cdn.example.com',
@@ -71,6 +76,7 @@ class CspTest(TestCase):
         assert result.get_culprit() == 'style-src cdn.example.com'
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 violated_directive='style-src https://cdn.example.com',
@@ -80,6 +86,7 @@ class CspTest(TestCase):
         assert result.get_culprit() == 'style-src https://cdn.example.com'
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 violated_directive='style-src http://example.com',
@@ -89,6 +96,7 @@ class CspTest(TestCase):
         assert result.get_culprit() == "style-src 'self'"
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 violated_directive='style-src http://example2.com example.com',
@@ -99,6 +107,7 @@ class CspTest(TestCase):
 
     def test_get_hash(self):
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 effective_directive='script-src',
@@ -108,6 +117,7 @@ class CspTest(TestCase):
         assert result.get_hash() == ['script-src', "'self'"]
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 effective_directive='script-src',
@@ -117,6 +127,7 @@ class CspTest(TestCase):
         assert result.get_hash() == ['script-src', "'self'"]
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 effective_directive='script-src',
@@ -126,6 +137,7 @@ class CspTest(TestCase):
         assert result.get_hash() == ['script-src', 'example.com']
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 effective_directive='img-src',
@@ -135,6 +147,7 @@ class CspTest(TestCase):
         assert result.get_hash() == ['img-src', 'data:']
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 effective_directive='img-src',
@@ -150,6 +163,7 @@ class CspTest(TestCase):
 
     def test_get_tags_stripe(self):
         result = Csp.to_python(
+            True,
             dict(
                 blocked_uri='https://api.stripe.com/v1/tokens?card[number]=xxx',
                 effective_directive='script-src',
@@ -162,6 +176,7 @@ class CspTest(TestCase):
 
     def test_get_message(self):
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 effective_directive='img-src',
@@ -171,6 +186,7 @@ class CspTest(TestCase):
         assert result.get_message() == "Blocked 'image' from 'google.com'"
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 effective_directive='style-src',
@@ -180,6 +196,7 @@ class CspTest(TestCase):
         assert result.get_message() == "Blocked inline 'style'"
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 effective_directive='script-src',
@@ -190,6 +207,7 @@ class CspTest(TestCase):
         assert result.get_message() == "Blocked unsafe eval() 'script'"
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 effective_directive='script-src',
@@ -200,6 +218,7 @@ class CspTest(TestCase):
         assert result.get_message() == "Blocked unsafe inline 'script'"
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 effective_directive='script-src',
@@ -210,6 +229,7 @@ class CspTest(TestCase):
         assert result.get_message() == "Blocked unsafe (eval() or inline) 'script'"
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 effective_directive='script-src',
@@ -219,6 +239,7 @@ class CspTest(TestCase):
         assert result.get_message() == "Blocked 'script' from 'data:'"
 
         result = Csp.to_python(
+            True,
             dict(
                 document_uri='http://example.com/foo',
                 effective_directive='script-src',

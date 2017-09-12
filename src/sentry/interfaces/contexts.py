@@ -151,11 +151,11 @@ class Contexts(Interface):
     score = 800
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, is_processed_data, data):
         rv = {}
         for alias, value in six.iteritems(data):
             rv[alias] = cls.normalize_context(alias, value)
-        return cls(**rv)
+        return cls(is_processed_data, **rv)
 
     @classmethod
     def normalize_context(cls, alias, data):

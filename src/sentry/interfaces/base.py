@@ -44,11 +44,9 @@ def get_interfaces(data, is_processed_data=True):
         except ValueError:
             continue
 
-        value = safe_execute(cls.to_python, data, _with_transaction=False)
+        value = safe_execute(cls.to_python, is_processed_data, data, _with_transaction=False)
         if not value:
             continue
-
-        value.is_processed_data = is_processed_data
 
         result.append((key, value))
 
@@ -72,9 +70,9 @@ class Interface(object):
     display_score = None
     ephemeral = False
 
-    def __init__(self, **data):
+    def __init__(self, is_processed_data, **data):
         self._data = data or {}
-        self.is_processed_data = True
+        self.is_processed_data = is_processed_data
 
     def __eq__(self, other):
         if type(self) != type(other):
@@ -104,8 +102,8 @@ class Interface(object):
             self._data[name] = value
 
     @classmethod
-    def to_python(cls, data):
-        return cls(data)
+    def to_python(cls, is_processed_data, data):
+        return cls(is_processed_data, data)
 
     def get_api_context(self, is_public=False):
         return self.to_json()
