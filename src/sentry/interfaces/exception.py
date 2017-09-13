@@ -42,7 +42,7 @@ class SingleException(Interface):
     score = 2000
 
     @classmethod
-    def to_python(cls, data, slim_frames=True):
+    def to_python(cls, data, slim_frames=True, is_processed_data=True):
         if not (data.get('type') or data.get('value')):
             raise InterfaceValidationError("No 'type' or 'value' present")
 
@@ -50,13 +50,17 @@ class SingleException(Interface):
             stacktrace = Stacktrace.to_python(
                 data['stacktrace'],
                 slim_frames=slim_frames,
+                is_processed_data=is_processed_data,
             )
         else:
             stacktrace = None
 
         if data.get('raw_stacktrace') and data['raw_stacktrace'].get('frames'):
             raw_stacktrace = Stacktrace.to_python(
-                data['raw_stacktrace'], slim_frames=slim_frames, raw=True
+                data['raw_stacktrace'],
+                slim_frames=slim_frames,
+                raw=True,
+                is_processed_data=is_processed_data,
             )
         else:
             raw_stacktrace = None
@@ -87,6 +91,7 @@ class SingleException(Interface):
             'stacktrace': stacktrace,
             'thread_id': trim(data.get('thread_id'), 40),
             'raw_stacktrace': raw_stacktrace,
+            'is_processed_data': is_processed_data,
         }
 
         return cls(**kwargs)
@@ -193,7 +198,7 @@ class Exception(Interface):
         return len(self.values)
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         if 'values' not in data:
             data = {'values': [data]}
 
@@ -207,6 +212,7 @@ class Exception(Interface):
             'values': [SingleException.to_python(
                 v,
                 slim_frames=False,
+                is_processed_data=is_processed_data,
             ) for v in data['values']],
         }
 
@@ -216,6 +222,8 @@ class Exception(Interface):
             kwargs['exc_omitted'] = data['exc_omitted']
         else:
             kwargs['exc_omitted'] = None
+
+        kwargs['is_processed_data'] = is_processed_data
 
         instance = cls(**kwargs)
         # we want to wait to slim things til we've reconciled in_app

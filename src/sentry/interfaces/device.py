@@ -19,7 +19,7 @@ class Device(Interface):
     """
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         data = data.copy()
 
         extra_data = data.pop('data', data)
@@ -43,6 +43,7 @@ class Device(Interface):
             'version': version,
             'build': build,
             'data': trim_dict(extra_data),
+            'is_processed_data': is_processed_data,
         }
         return cls(**kwargs)
 

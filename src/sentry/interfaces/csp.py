@@ -84,13 +84,15 @@ class Csp(Interface):
     display_score = 1300
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         kwargs = {k: trim(data.get(k, None), 1024) for k in REPORT_KEYS}
 
         # Anything resulting from an "inline" whatever violation is either sent
         # as 'self', or left off. In the case if it missing, we want to noramalize.
         if not kwargs['blocked_uri']:
             kwargs['blocked_uri'] = 'self'
+
+        kwargs['is_processed_data'] = is_processed_data
 
         return cls(**kwargs)
 

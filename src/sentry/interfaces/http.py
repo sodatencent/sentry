@@ -120,7 +120,7 @@ class Http(Interface):
     FORM_TYPE = 'application/x-www-form-urlencoded'
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         if not data.get('url'):
             raise InterfaceValidationError("No value for 'url'")
 
@@ -180,6 +180,7 @@ class Http(Interface):
         kwargs['data'] = fix_broken_encoding(body)
         kwargs['url'] = urlunsplit((scheme, netloc, path, '', ''))
         kwargs['fragment'] = trim(fragment, 1024)
+        kwargs['is_processed_data'] = is_processed_data
 
         return cls(**kwargs)
 

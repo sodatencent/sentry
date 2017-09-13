@@ -26,7 +26,7 @@ class AppleCrashReport(Interface):
     ephemeral = True
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         if not data.get('crash'):
             raise InterfaceValidationError("No 'crash' present")
         if not data.get('binary_images'):
@@ -36,6 +36,7 @@ class AppleCrashReport(Interface):
             'crash': data['crash'],
             'system': data.get('system') or {},
             'binary_images': data['binary_images'],
+            'is_processed_data': is_processed_data,
         }
 
         return cls(**kwargs)

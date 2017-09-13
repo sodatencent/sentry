@@ -40,7 +40,7 @@ class Message(Interface):
     display_score = 2050
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         if not data.get('message'):
             raise InterfaceValidationError("No 'message' present")
 
@@ -87,6 +87,8 @@ class Message(Interface):
         # don't wastefully store formatted message twice
         if kwargs['formatted'] == kwargs['message']:
             kwargs['formatted'] = None
+
+        kwargs['is_processed_data'] = is_processed_data
 
         return cls(**kwargs)
 

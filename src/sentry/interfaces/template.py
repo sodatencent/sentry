@@ -41,7 +41,7 @@ class Template(Interface):
     score = 1100
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         if not data.get('filename'):
             raise InterfaceValidationError("Missing 'filename'")
         if not data.get('context_line'):
@@ -57,6 +57,7 @@ class Template(Interface):
             # TODO(dcramer): trim pre/post_context
             'pre_context': data.get('pre_context'),
             'post_context': data.get('post_context'),
+            'is_processed_data': is_processed_data,
         }
         return cls(**kwargs)
 

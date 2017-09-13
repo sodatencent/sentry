@@ -24,7 +24,7 @@ class Repos(Interface):
     """
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         result = {}
         for path, config in six.iteritems(data):
             if len(path) > 200:
@@ -54,6 +54,8 @@ class Repos(Interface):
                 result[path]['prefix'] = prefix
             if revision:
                 result[path]['revision'] = revision
+
+        result['is_processed_data'] = is_processed_data
         return cls(**result)
 
     def get_path(self):

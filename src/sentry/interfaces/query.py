@@ -25,13 +25,14 @@ class Query(Interface):
     """
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         if not data.get('query'):
             raise InterfaceValidationError("No 'query' value")
 
         kwargs = {
             'query': trim(data['query'], 1024),
             'engine': trim(data.get('engine'), 128),
+            'is_processed_data': is_processed_data,
         }
         return cls(**kwargs)
 

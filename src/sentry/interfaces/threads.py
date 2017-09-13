@@ -7,26 +7,35 @@ from sentry.utils.safe import trim
 __all__ = ('Threads', )
 
 
-def get_stacktrace(value, raw=False):
+def get_stacktrace(value, raw=False, is_processed_data=True):
     # Special case: if the thread has no frames we set the
     # stacktrace to none.  Otherwise this will fail really
     # badly.
     if value and value.get('frames'):
-        return Stacktrace.to_python(value, slim_frames=True, raw=raw)
+        return Stacktrace.to_python(
+            value, slim_frames=True, raw=raw, is_processed_data=is_processed_data
+        )
 
 
 class Threads(Interface):
     score = 1900
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         threads = []
 
         for thread in data.get('values') or ():
             threads.append(
                 {
-                    'stacktrace': get_stacktrace(thread.get('stacktrace')),
-                    'raw_stacktrace': get_stacktrace(thread.get('raw_stacktrace'), raw=True),
+                    'stacktrace': get_stacktrace(
+                        thread.get('stacktrace'),
+                        is_processed_data=is_processed_data
+                    ),
+                    'raw_stacktrace': get_stacktrace(
+                        thread.get('raw_stacktrace'),
+                        raw=True,
+                        is_processed_data=is_processed_data,
+                    ),
                     'id': trim(thread.get('id'), 40),
                     'crashed': bool(thread.get('crashed')),
                     'current': bool(thread.get('current')),
@@ -34,7 +43,7 @@ class Threads(Interface):
                 }
             )
 
-        return cls(values=threads)
+        return cls(values=threads, is_processed_data=is_processed_data)
 
     def to_json(self):
         def export_thread(data):

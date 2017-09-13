@@ -50,7 +50,7 @@ class User(Interface):
     """
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         data = data.copy()
 
         extra_data = data.pop('data', data)
@@ -88,6 +88,7 @@ class User(Interface):
             'username': username,
             'ip_address': ip_address,
             'name': name,
+            'is_processed_data': is_processed_data,
         }
 
         kwargs['data'] = trim_dict(extra_data)

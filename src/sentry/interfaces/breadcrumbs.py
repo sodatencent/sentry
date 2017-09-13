@@ -50,7 +50,7 @@ class Breadcrumbs(Interface):
     score = 800
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         values = []
         for crumb in data.get('values') or ():
             try:
@@ -60,7 +60,7 @@ class Breadcrumbs(Interface):
                 # when one breadcrumb errors, but it'd be nice if we could still
                 # record an error
                 continue
-        return cls(values=values)
+        return cls(values=values, is_processed_data=is_processed_data)
 
     @classmethod
     def normalize_crumb(cls, crumb):

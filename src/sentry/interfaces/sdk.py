@@ -41,7 +41,7 @@ class Sdk(Interface):
     """
 
     @classmethod
-    def to_python(cls, data):
+    def to_python(cls, data, is_processed_data=True):
         name = data.get('name')
         if not name:
             raise InterfaceValidationError("No 'name' value")
@@ -59,6 +59,7 @@ class Sdk(Interface):
             'version': trim(version, 128),
             'client_ip': data.get('client_ip'),
             'integrations': integrations,
+            'is_processed_data': is_processed_data,
         }
         return cls(**kwargs)
 

@@ -254,7 +254,7 @@ def handle_nan(value):
 
 class Frame(Interface):
     @classmethod
-    def to_python(cls, data, raw=False):
+    def to_python(cls, data, raw=False, is_processed_data=True):
         abs_path = data.get('abs_path')
         filename = data.get('filename')
         symbol = data.get('symbol')
@@ -353,6 +353,7 @@ class Frame(Interface):
             'vars': context_locals,
             'data': extra_data,
             'errors': data.get('errors'),
+            'is_processed_data': is_processed_data,
         }
 
         if data.get('lineno') is not None:
@@ -413,10 +414,11 @@ class Frame(Interface):
         # XXX: hack around what appear to be non-useful lines of context
         if can_use_context:
             output.append(self.context_line)
-        elif not output and not self.is_processed_data:
+        elif not output and self.is_processed_data:
             # If we were unable to achieve any context at this point
             # (likely due to a bad JavaScript error) we should just
-            # bail on recording this frame
+            # bail on recording this frame unless we're working with
+            # unprocessed data
             return output
         elif self.symbol:
             output.append(self.symbol)
@@ -655,7 +657,7 @@ class Stacktrace(Interface):
         return iter(self.frames)
 
     @classmethod
-    def to_python(cls, data, slim_frames=True, raw=False):
+    def to_python(cls, data, slim_frames=True, raw=False, is_processed_data=True):
         if not data.get('frames'):
             raise InterfaceValidationError("No 'frames' present")
 
@@ -664,7 +666,9 @@ class Stacktrace(Interface):
 
         frame_list = [
             # XXX(dcramer): handle PHP sending an empty array for a frame
-            Frame.to_python(f or {}, raw=raw) for f in data['frames']
+            Frame.to_python(
+                f or {}, raw=raw, is_processed_data=is_processed_data
+            ) for f in data['frames']
         ]
 
         kwargs = {
@@ -681,6 +685,8 @@ class Stacktrace(Interface):
             kwargs['frames_omitted'] = data['frames_omitted']
         else:
             kwargs['frames_omitted'] = None
+
+        kwargs['is_processed_data'] = is_processed_data
 
         instance = cls(**kwargs)
         if slim_frames:
