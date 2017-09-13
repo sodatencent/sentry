@@ -413,7 +413,7 @@ class Frame(Interface):
         # XXX: hack around what appear to be non-useful lines of context
         if can_use_context:
             output.append(self.context_line)
-        elif not output:
+        elif not output and not self.is_processed_data:
             # If we were unable to achieve any context at this point
             # (likely due to a bad JavaScript error) we should just
             # bail on recording this frame
@@ -427,7 +427,7 @@ class Frame(Interface):
                 output.append(remove_function_outliers(self.function))
         elif self.lineno is not None:
             output.append(self.lineno)
-            if not self.is_processed_data:
+            if not self.is_processed_data and self.colno is not None:
                 output.append(self.colno)
         return output
 

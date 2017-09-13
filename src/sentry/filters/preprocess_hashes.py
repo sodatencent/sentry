@@ -31,7 +31,7 @@ def get_preprocess_hash_inputs_with_reason(data):
         result = interface.get_hash(data['platform'], system_frames=True)
         if not result:
             continue
-        return (interface.get_path(), result)
+        return (interface.get_path(), [result])
     return ('message', [data['message']])
 
 
