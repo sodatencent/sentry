@@ -12,7 +12,6 @@ class AppleCrashReportTest(TestCase):
     @fixture
     def interface(self):
         return AppleCrashReport.to_python(
-            True,
             dict(
                 crash={
                     'diagnosis': 'Aha',
@@ -47,7 +46,7 @@ class AppleCrashReportTest(TestCase):
         assert self.interface.get_path() == 'sentry.interfaces.AppleCrashReport'
 
     def test_serialize_unserialize_behavior(self):
-        result = type(self.interface).to_python(True, self.interface.to_json())
+        result = type(self.interface).to_python(self.interface.to_json())
         assert result.to_json() == self.interface.to_json()
 
     def test_empty_hash(self):

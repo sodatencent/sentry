@@ -50,7 +50,7 @@ class User(Interface):
     """
 
     @classmethod
-    def to_python(cls, is_processed_data, data):
+    def to_python(cls, data):
         data = data.copy()
 
         extra_data = data.pop('data', data)
@@ -91,7 +91,7 @@ class User(Interface):
         }
 
         kwargs['data'] = trim_dict(extra_data)
-        return cls(is_processed_data, **kwargs)
+        return cls(**kwargs)
 
     def get_api_context(self, is_public=False):
         return {

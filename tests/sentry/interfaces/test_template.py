@@ -14,13 +14,13 @@ from sentry.testutils import TestCase
 class TemplateTest(TestCase):
     @fixture
     def interface(self):
-        return Template.to_python(True,
-                                  dict(
-                                      filename='foo.html',
-                                      context_line='hello world',
-                                      lineno=1,
-                                  )
-                                  )
+        return Template.to_python(
+            dict(
+                filename='foo.html',
+                context_line='hello world',
+                lineno=1,
+            )
+        )
 
     def test_serialize(self):
         result = self.interface.to_json()
@@ -42,7 +42,7 @@ class TemplateTest(TestCase):
         self.assertEquals(result, 'Stacktrace (most recent call last):\n\ntraceback')
 
     def test_serialize_unserialize_behavior(self):
-        result = type(self.interface).to_python(True, self.interface.to_json())
+        result = type(self.interface).to_python(self.interface.to_json())
         assert result.to_json() == self.interface.to_json()
 
     def test_get_api_context(self):

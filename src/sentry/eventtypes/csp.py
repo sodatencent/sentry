@@ -15,7 +15,7 @@ class CspEvent(BaseEvent):
         from sentry.interfaces.csp import Csp
         # TODO(dcramer): pull get message into here to avoid instantiation
         # or ensure that these get interfaces passed instead of raw data
-        csp = Csp.to_python(True, self.data['sentry.interfaces.Csp'])
+        csp = Csp.to_python(self.data['sentry.interfaces.Csp'])
 
         return {
             'directive': csp.effective_directive,

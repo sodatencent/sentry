@@ -40,7 +40,7 @@ class Message(Interface):
     display_score = 2050
 
     @classmethod
-    def to_python(cls, is_processed_data, data):
+    def to_python(cls, data):
         if not data.get('message'):
             raise InterfaceValidationError("No 'message' present")
 
@@ -88,7 +88,7 @@ class Message(Interface):
         if kwargs['formatted'] == kwargs['message']:
             kwargs['formatted'] = None
 
-        return cls(is_processed_data, **kwargs)
+        return cls(**kwargs)
 
     def get_path(self):
         return 'sentry.interfaces.Message'

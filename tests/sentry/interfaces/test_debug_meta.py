@@ -13,7 +13,6 @@ class DebugMetaTest(TestCase):
             'B33C37A8-F933-4B6B-9FFA-152282BFDF13/SentryTest.app/SentryTest'
         )
         interface = DebugMeta.to_python(
-            True,
             {
                 "images": [
                     {
@@ -54,7 +53,6 @@ class DebugMetaTest(TestCase):
 
     def test_proguard_behavior(self):
         interface = DebugMeta.to_python(
-            True,
             {
                 "images": [{
                     "type": "proguard",

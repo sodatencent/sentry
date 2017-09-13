@@ -42,13 +42,12 @@ class SingleException(Interface):
     score = 2000
 
     @classmethod
-    def to_python(cls, is_processed_data, data, slim_frames=True):
+    def to_python(cls, data, slim_frames=True):
         if not (data.get('type') or data.get('value')):
             raise InterfaceValidationError("No 'type' or 'value' present")
 
         if data.get('stacktrace') and data['stacktrace'].get('frames'):
             stacktrace = Stacktrace.to_python(
-                is_processed_data,
                 data['stacktrace'],
                 slim_frames=slim_frames,
             )
@@ -57,10 +56,7 @@ class SingleException(Interface):
 
         if data.get('raw_stacktrace') and data['raw_stacktrace'].get('frames'):
             raw_stacktrace = Stacktrace.to_python(
-                is_processed_data,
-                data['raw_stacktrace'],
-                slim_frames=slim_frames,
-                raw=True,
+                data['raw_stacktrace'], slim_frames=slim_frames, raw=True
             )
         else:
             raw_stacktrace = None
@@ -93,7 +89,7 @@ class SingleException(Interface):
             'raw_stacktrace': raw_stacktrace,
         }
 
-        return cls(is_processed_data, **kwargs)
+        return cls(**kwargs)
 
     def to_json(self):
         if self.stacktrace:
@@ -197,7 +193,7 @@ class Exception(Interface):
         return len(self.values)
 
     @classmethod
-    def to_python(cls, is_processed_data, data):
+    def to_python(cls, data):
         if 'values' not in data:
             data = {'values': [data]}
 
@@ -209,7 +205,6 @@ class Exception(Interface):
 
         kwargs = {
             'values': [SingleException.to_python(
-                is_processed_data,
                 v,
                 slim_frames=False,
             ) for v in data['values']],
@@ -222,7 +217,7 @@ class Exception(Interface):
         else:
             kwargs['exc_omitted'] = None
 
-        instance = cls(is_processed_data, **kwargs)
+        instance = cls(**kwargs)
         # we want to wait to slim things til we've reconciled in_app
         slim_exception_data(instance)
         return instance

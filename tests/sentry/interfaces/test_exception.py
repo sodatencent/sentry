@@ -13,7 +13,6 @@ class ExceptionTest(TestCase):
     @fixture
     def interface(self):
         return Exception.to_python(
-            True,
             dict(
                 values=[
                     {
@@ -48,7 +47,6 @@ class ExceptionTest(TestCase):
 
     def test_args_as_keyword_args(self):
         inst = Exception.to_python(
-            True,
             dict(values=[{
                 'type': 'ValueError',
                 'value': 'hello world',
@@ -62,7 +60,6 @@ class ExceptionTest(TestCase):
 
     def test_args_as_old_style(self):
         inst = Exception.to_python(
-            True,
             {
                 'type': 'ValueError',
                 'value': 'hello world',
@@ -75,7 +72,7 @@ class ExceptionTest(TestCase):
         assert inst.values[0].module == 'foo.bar'
 
     def test_serialize_unserialize_behavior(self):
-        result = type(self.interface).to_python(True, self.interface.to_json())
+        result = type(self.interface).to_python(self.interface.to_json())
         assert result.to_json() == self.interface.to_json()
 
     def test_to_string(self):
@@ -94,7 +91,6 @@ ValueError: hello world
 
     def test_context_with_mixed_frames(self):
         inst = Exception.to_python(
-            True,
             dict(
                 values=[
                     {
@@ -132,7 +128,6 @@ ValueError: hello world
 
     def test_context_with_symbols(self):
         inst = Exception.to_python(
-            True,
             dict(
                 values=[
                     {
@@ -163,7 +158,6 @@ ValueError: hello world
 
     def test_context_with_only_system_frames(self):
         inst = Exception.to_python(
-            True,
             dict(
                 values=[
                     {
@@ -227,7 +221,7 @@ ValueError: hello world
         ]
         exc = dict(values=values)
         normalize_in_app({'sentry.interfaces.Exception': exc})
-        inst = Exception.to_python(True, exc)
+        inst = Exception.to_python(exc)
 
         self.create_event(data={
             'sentry.interfaces.Exception': inst.to_json(),
@@ -237,7 +231,6 @@ ValueError: hello world
 
     def test_context_with_raw_stacks(self):
         inst = Exception.to_python(
-            True,
             dict(
                 values=[
                     {
@@ -281,7 +274,6 @@ class SingleExceptionTest(TestCase):
     @fixture
     def interface(self):
         return SingleException.to_python(
-            True,
             dict(
                 type='ValueError',
                 value='hello world',
@@ -319,20 +311,19 @@ class SingleExceptionTest(TestCase):
         ]
 
     def test_serialize_unserialize_behavior(self):
-        result = type(self.interface).to_python(True, self.interface.to_json())
+        result = type(self.interface).to_python(self.interface.to_json())
         assert result.to_json() == self.interface.to_json()
 
     def test_only_requires_only_type_or_value(self):
-        SingleException.to_python(True, dict(
+        SingleException.to_python(dict(
             type='ValueError',
         ))
-        SingleException.to_python(True, dict(
+        SingleException.to_python(dict(
             value='ValueError',
         ))
 
     def test_throws_away_empty_stacktrace(self):
         result = SingleException.to_python(
-            True,
             dict(
                 type='ValueError',
                 value='foo',
@@ -342,20 +333,20 @@ class SingleExceptionTest(TestCase):
         assert not result.stacktrace
 
     def test_coerces_object_value_to_string(self):
-        result = SingleException.to_python(True, dict(
+        result = SingleException.to_python(dict(
             type='ValueError',
             value={'unauthorized': True},
         ))
         assert result.value == '{"unauthorized":true}'
 
     def test_handles_type_in_value(self):
-        result = SingleException.to_python(True, dict(
+        result = SingleException.to_python(dict(
             value='ValueError: unauthorized',
         ))
         assert result.type == 'ValueError'
         assert result.value == 'unauthorized'
 
-        result = SingleException.to_python(True, dict(
+        result = SingleException.to_python(dict(
             value='ValueError:unauthorized',
         ))
         assert result.type == 'ValueError'
@@ -364,18 +355,18 @@ class SingleExceptionTest(TestCase):
 
 class SlimExceptionDataTest(TestCase):
     def test_under_max(self):
-        interface = Exception.to_python(True,
-                                        {
-                                            'values': [{
-                                                'value': 'foo',
-                                                'stacktrace': {
-                                                    'frames': [{
-                                                        'filename': 'foo'
-                                                    }]
-                                                },
-                                            }]
-                                        }
-                                        )
+        interface = Exception.to_python(
+            {
+                'values': [{
+                    'value': 'foo',
+                    'stacktrace': {
+                        'frames': [{
+                            'filename': 'foo'
+                        }]
+                    },
+                }]
+            }
+        )
         slim_exception_data(interface)
         assert len(interface.values[0].stacktrace.frames) == 1
 
@@ -397,7 +388,7 @@ class SlimExceptionDataTest(TestCase):
                     }
                 )
 
-        interface = Exception.to_python(True, {'values': values})
+        interface = Exception.to_python({'values': values})
 
         # slim to 10 frames to make tests easier
         slim_exception_data(interface, 10)

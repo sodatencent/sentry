@@ -25,7 +25,7 @@ class Query(Interface):
     """
 
     @classmethod
-    def to_python(cls, is_processed_data, data):
+    def to_python(cls, data):
         if not data.get('query'):
             raise InterfaceValidationError("No 'query' value")
 
@@ -33,7 +33,7 @@ class Query(Interface):
             'query': trim(data['query'], 1024),
             'engine': trim(data.get('engine'), 128),
         }
-        return cls(is_processed_data, **kwargs)
+        return cls(**kwargs)
 
     def get_hash(self):
         return [self.query]

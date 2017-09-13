@@ -12,7 +12,7 @@ from sentry.testutils import TestCase
 class HttpTest(TestCase):
     @fixture
     def interface(self):
-        return Http.to_python(True, dict(
+        return Http.to_python(dict(
             url='http://example.com',
         ))
 
@@ -20,7 +20,7 @@ class HttpTest(TestCase):
         assert self.interface.get_path() == 'sentry.interfaces.Http'
 
     def test_serialize_unserialize_behavior(self):
-        result = type(self.interface).to_python(True, self.interface.to_json())
+        result = type(self.interface).to_python(self.interface.to_json())
         assert result.to_json() == self.interface.to_json()
 
     def test_basic(self):
@@ -37,7 +37,6 @@ class HttpTest(TestCase):
 
     def test_full(self):
         result = Http.to_python(
-            True,
             dict(
                 method='GET',
                 url='http://example.com',
@@ -58,7 +57,7 @@ class HttpTest(TestCase):
         assert result.data == 'hello world'
 
     def test_query_string_as_dict(self):
-        result = Http.to_python(True, dict(
+        result = Http.to_python(dict(
             url='http://example.com',
             query_string={'foo': 'bar'},
         ))
@@ -66,7 +65,6 @@ class HttpTest(TestCase):
 
     def test_query_string_as_dict_unicode(self):
         result = Http.to_python(
-            True,
             dict(
                 url='http://example.com',
                 query_string={'foo': u'\N{SNOWMAN}'},
@@ -75,52 +73,51 @@ class HttpTest(TestCase):
         assert result.query_string == 'foo=%E2%98%83'
 
     def test_data_as_dict(self):
-        result = Http.to_python(True, dict(
+        result = Http.to_python(dict(
             url='http://example.com',
             data={'foo': 'bar'},
         ))
         assert result.data == '{"foo":"bar"}'
 
     def test_form_encoded_data(self):
-        result = Http.to_python(True,
-                                dict(
-                                    url='http://example.com',
-                                    headers={'Content-Type': 'application/x-www-form-urlencoded'},
-                                    data='foo=bar',
-                                )
-                                )
+        result = Http.to_python(
+            dict(
+                url='http://example.com',
+                headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                data='foo=bar',
+            )
+        )
         assert result.data == 'foo=bar'
 
     def test_cookies_as_string(self):
-        result = Http.to_python(True, dict(
+        result = Http.to_python(dict(
             url='http://example.com',
             cookies='a=b;c=d',
         ))
         assert result.cookies == [('a', 'b'), ('c', 'd')]
-        result = Http.to_python(True, dict(
+        result = Http.to_python(dict(
             url='http://example.com',
             cookies='a=b&c=d',
         ))
         assert result.cookies == [('a', 'b'), ('c', 'd')]
 
     def test_cookies_in_header(self):
-        result = Http.to_python(True, dict(
+        result = Http.to_python(dict(
             url='http://example.com',
             headers={'Cookie': 'a=b;c=d'},
         ))
         assert result.cookies == [('a', 'b'), ('c', 'd')]
-        result = Http.to_python(True,
-                                dict(
-                                    url='http://example.com',
-                                    headers={'Cookie': 'a=b;c=d'},
-                                    cookies={'foo': 'bar'},
-                                )
-                                )
+        result = Http.to_python(
+            dict(
+                url='http://example.com',
+                headers={'Cookie': 'a=b;c=d'},
+                cookies={'foo': 'bar'},
+            )
+        )
         assert result.cookies == [('foo', 'bar')]
 
     def test_query_string_and_fragment_as_params(self):
         result = Http.to_python(
-            True,
             dict(
                 url='http://example.com',
                 query_string='foo=bar',
@@ -131,55 +128,55 @@ class HttpTest(TestCase):
         assert result.full_url == 'http://example.com?foo=bar#fragment'
 
     def test_query_string_and_fragment_in_url(self):
-        result = Http.to_python(True, dict(
+        result = Http.to_python(dict(
             url='http://example.com?foo=bar#fragment',
         ))
         assert result.url == 'http://example.com'
         assert result.full_url == 'http://example.com?foo=bar#fragment'
 
     def test_header_value_list(self):
-        result = Http.to_python(True, dict(
+        result = Http.to_python(dict(
             url='http://example.com',
             headers={'Foo': ['1', '2']},
         ))
         assert result.headers == [('Foo', '1, 2')]
 
     def test_header_value_str(self):
-        result = Http.to_python(True, dict(url='http://example.com', headers={'Foo': 1}))
+        result = Http.to_python(dict(url='http://example.com', headers={'Foo': 1}))
         assert result.headers == [('Foo', '1')]
 
     def test_method(self):
         with self.assertRaises(InterfaceValidationError):
-            Http.to_python(True, dict(
+            Http.to_python(dict(
                 url='http://example.com',
                 method='1234',
             ))
 
         with self.assertRaises(InterfaceValidationError):
-            Http.to_python(True, dict(
+            Http.to_python(dict(
                 url='http://example.com',
                 method='A' * 33,
             ))
 
         with self.assertRaises(InterfaceValidationError):
-            Http.to_python(True, dict(
+            Http.to_python(dict(
                 url='http://example.com',
                 method='A',
             ))
 
-        result = Http.to_python(True, dict(
+        result = Http.to_python(dict(
             url='http://example.com',
             method='TEST',
         ))
         assert result.method == 'TEST'
 
-        result = Http.to_python(True, dict(
+        result = Http.to_python(dict(
             url='http://example.com',
             method='FOO-BAR',
         ))
         assert result.method == 'FOO-BAR'
 
-        result = Http.to_python(True, dict(
+        result = Http.to_python(dict(
             url='http://example.com',
             method='FOO_BAR',
         ))

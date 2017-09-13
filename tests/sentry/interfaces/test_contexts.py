@@ -8,14 +8,13 @@ from sentry.testutils import TestCase
 
 class ContextsTest(TestCase):
     def test_os(self):
-        ctx = Contexts.to_python(
-            True, {
-                'os': {
-                    'name': 'Windows',
-                    'version': '95',
-                    'rooted': True,
-                },
-            })
+        ctx = Contexts.to_python({
+            'os': {
+                'name': 'Windows',
+                'version': '95',
+                'rooted': True,
+            },
+        })
         assert sorted(ctx.iter_tags()) == [
             ('os', 'Windows 95'),
             ('os.name', 'Windows'),
@@ -32,7 +31,7 @@ class ContextsTest(TestCase):
 
     def test_runtime(self):
         ctx = Contexts.to_python(
-            True, {
+            {
                 'runtime': {
                     'name': 'Java',
                     'version': '1.2.3',
@@ -55,7 +54,7 @@ class ContextsTest(TestCase):
 
     def test_device(self):
         ctx = Contexts.to_python(
-            True, {
+            {
                 'device': {
                     'name': 'My iPad',
                     'model': 'iPad',
@@ -81,7 +80,7 @@ class ContextsTest(TestCase):
 
     def test_device_with_alias(self):
         ctx = Contexts.to_python(
-            True, {
+            {
                 'my_device': {
                     'type': 'device',
                     'title': 'My Title',
@@ -108,7 +107,7 @@ class ContextsTest(TestCase):
 
     def test_default(self):
         ctx = Contexts.to_python(
-            True, {
+            {
                 'whatever': {
                     'foo': 'bar',
                     'blub': 'blah',
@@ -133,16 +132,15 @@ class ContextsTest(TestCase):
         }
 
     def test_path(self):
-        assert Contexts(True).get_path() == 'contexts'
+        assert Contexts().get_path() == 'contexts'
 
     def test_app(self):
-        ctx = Contexts.to_python(
-            True, {
-                'app': {
-                    'app_id': '1234',
-                    'device_app_hash': '5678',
-                },
-            })
+        ctx = Contexts.to_python({
+            'app': {
+                'app_id': '1234',
+                'device_app_hash': '5678',
+            },
+        })
         assert sorted(ctx.iter_tags()) == [
             ('app.device', '5678'),
         ]

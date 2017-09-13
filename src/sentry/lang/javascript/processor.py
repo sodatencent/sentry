@@ -471,7 +471,7 @@ class JavaScriptStacktraceProcessor(StacktraceProcessor):
         if 'sentry.interfaces.Stacktrace' in data:
             stacktraces.append(data['sentry.interfaces.Stacktrace'])
 
-        return [(s, Stacktrace.to_python(True, s)) for s in stacktraces]
+        return [(s, Stacktrace.to_python(s)) for s in stacktraces]
 
     def get_valid_frames(self):
         # build list of frames that we can actually grab source for

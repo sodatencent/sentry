@@ -84,7 +84,7 @@ class Csp(Interface):
     display_score = 1300
 
     @classmethod
-    def to_python(cls, is_processed_data, data):
+    def to_python(cls, data):
         kwargs = {k: trim(data.get(k, None), 1024) for k in REPORT_KEYS}
 
         # Anything resulting from an "inline" whatever violation is either sent
@@ -92,7 +92,7 @@ class Csp(Interface):
         if not kwargs['blocked_uri']:
             kwargs['blocked_uri'] = 'self'
 
-        return cls(is_processed_data, **kwargs)
+        return cls(**kwargs)
 
     def get_hash(self):
         directive = self.effective_directive

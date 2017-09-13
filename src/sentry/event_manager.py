@@ -185,7 +185,7 @@ def generate_culprit(data, platform=None):
             culprit = data['sentry.interfaces.Http'].get('url', '')
     else:
         from sentry.interfaces.stacktrace import Stacktrace
-        culprit = Stacktrace.to_python(True, stacktraces[-1]).get_culprit_string(
+        culprit = Stacktrace.to_python(stacktraces[-1]).get_culprit_string(
             platform=platform,
         )
 
@@ -340,12 +340,12 @@ class EventManager(object):
             value = data.pop(key)
 
             try:
-                interface = get_interface(key)(is_processed_data=True)
+                interface = get_interface(key)()
             except ValueError:
                 continue
 
             try:
-                inst = interface.to_python(True, value)
+                inst = interface.to_python(value)
                 data[inst.get_path()] = inst.to_json()
             except Exception:
                 # XXX: we should consider logging this.
@@ -362,7 +362,7 @@ class EventManager(object):
             if 'sentry.interfaces.Message' not in data:
                 interface = get_interface('sentry.interfaces.Message')
                 try:
-                    inst = interface.to_python(True, {
+                    inst = interface.to_python({
                         'message': message,
                     })
                     data[inst.get_path()] = inst.to_json()
@@ -372,7 +372,6 @@ class EventManager(object):
                 interface = get_interface('sentry.interfaces.Message')
                 try:
                     inst = interface.to_python(
-                        True,
                         dict(
                             data['sentry.interfaces.Message'],
                             formatted=message,

@@ -120,7 +120,7 @@ class Http(Interface):
     FORM_TYPE = 'application/x-www-form-urlencoded'
 
     @classmethod
-    def to_python(cls, is_processed_data, data):
+    def to_python(cls, data):
         if not data.get('url'):
             raise InterfaceValidationError("No value for 'url'")
 
@@ -181,7 +181,7 @@ class Http(Interface):
         kwargs['url'] = urlunsplit((scheme, netloc, path, '', ''))
         kwargs['fragment'] = trim(fragment, 1024)
 
-        return cls(is_processed_data, **kwargs)
+        return cls(**kwargs)
 
     def get_path(self):
         return 'sentry.interfaces.Http'

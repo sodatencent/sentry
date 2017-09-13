@@ -72,7 +72,7 @@ class DebugMeta(Interface):
     ephemeral = False
 
     @classmethod
-    def to_python(cls, is_processed_data, data):
+    def to_python(cls, data):
         if 'images' not in data:
             raise InterfaceValidationError('Missing key "images"')
         is_debug_build = data.get('is_debug_build')
@@ -80,7 +80,6 @@ class DebugMeta(Interface):
             raise InterfaceValidationError('Invalid value for "is_debug_build"')
 
         return cls(
-            is_processed_data,
             images=[cls.normalize_image(x) for x in data['images']],
             sdk_info=cls.normalize_sdk_info(data.get('sdk_info')),
             is_debug_build=is_debug_build,

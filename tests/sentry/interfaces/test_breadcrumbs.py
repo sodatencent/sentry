@@ -8,11 +8,10 @@ from sentry.testutils import TestCase
 
 class BreadcrumbsTest(TestCase):
     def test_path(self):
-        assert Breadcrumbs(True).get_path() == 'sentry.interfaces.Breadcrumbs'
+        assert Breadcrumbs().get_path() == 'sentry.interfaces.Breadcrumbs'
 
     def test_simple(self):
         result = Breadcrumbs.to_python(
-            True,
             dict(
                 values=[
                     {
@@ -34,7 +33,6 @@ class BreadcrumbsTest(TestCase):
 
     def test_non_string_keys(self):
         result = Breadcrumbs.to_python(
-            True,
             dict(
                 values=[
                     {
