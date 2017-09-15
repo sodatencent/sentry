@@ -13,7 +13,7 @@ import warnings
 
 from bitfield import BitField
 from django.conf import settings
-from django.db import models
+from django.db import IntegrityError, models, transaction
 from django.db.models import F
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -30,6 +30,18 @@ from sentry.utils.retries import TimedRetryPolicy
 
 # TODO(dcramer): pull in enum library
 ProjectStatus = ObjectStatus
+
+
+class ProjectTeam(Model):
+    __core__ = True
+
+    project = FlexibleForeignKey('sentry.Project')
+    team = FlexibleForeignKey('sentry.Team')
+
+    class Meta:
+        app_label = 'sentry'
+        db_table = 'sentry_projectteam'
+        unique_together = (('project', 'team'), )
 
 
 class ProjectManager(BaseManager):
@@ -78,6 +90,9 @@ class Project(Model):
     forced_color = models.CharField(max_length=6, null=True, blank=True)
     organization = FlexibleForeignKey('sentry.Organization')
     team = FlexibleForeignKey('sentry.Team')
+    teams = models.ManyToManyField(
+        'sentry.Team', related_name='teams', through=ProjectTeam
+    )
     public = models.BooleanField(default=False)
     date_added = models.DateTimeField(default=timezone.now)
     status = BoundedPositiveIntegerField(
@@ -322,3 +337,12 @@ class Project(Model):
                 user, 'workflow:notifications', UserOptionValue.all_conversations
             )
         return opt_value == UserOptionValue.all_conversations
+
+    def add_team(self, team):
+        try:
+            with transaction.atomic():
+                ProjectTeam.objects.create(project=self, team=team)
+        except IntegrityError:
+            return False
+        else:
+            return True

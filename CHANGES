@@ -23,6 +23,7 @@ Schema Changes
 - Dropped ``GroupTagKey.group_id`` foreign key constraint
 - Dropped ``EventUser.project_id`` foreign key constraint
 - Added ``Email`` model
+- Added ``ProjectTeam`` model
 
 Version 8.19
 ------------
