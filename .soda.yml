@@ -1,4 +1,5 @@
 from: mac
 envs: 
     version: 3.0.1
+    test: value
     build: helo
