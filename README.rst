@@ -39,5 +39,4 @@ Resources
 * `IRC <irc://irc.freenode.net/sentry>`_  (irc.freenode.net, #sentry)
 * `Transifex <https://www.transifex.com/getsentry/sentry/>`_ (Translate Sentry!)
 
-Update
-Update
+SODA
