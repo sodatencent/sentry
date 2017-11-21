@@ -40,4 +40,4 @@ Resources
 * `Transifex <https://www.transifex.com/getsentry/sentry/>`_ (Translate Sentry!)
 
 SODA
-RD
+Rd
